@@ -21,5 +21,3 @@ starlette
 uvicorn
 names
 ctdb-utility-lib
-enum
-typing
