@@ -106,7 +106,7 @@ def api_add_room(room_id: str, capacity: int, building_name: str):
     if connection is None:
         connection = connect_to_db()
 
-    response = add_room(room_id, capacity, building_name)
+    response = add_room(room_id, capacity, building_name, connection)
     if response == -1:
         raise fastapi.HTTPException(
             status_code=400, detail="Room Id/Building name invalid, or room already exists")
