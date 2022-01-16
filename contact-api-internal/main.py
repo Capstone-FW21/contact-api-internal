@@ -70,12 +70,12 @@ def breakout(email: str, date: str):
 
 #returns all entries for specific type
 @app.get("/stats/")
-def stats(type: str):
+def stats(stat_type: str):
     global connection
     if connection is None:
         connection = connect_to_db()
 
-    match type:
+    match stat_type:
         case 'student':
             result = get_people(connection)
             if result == None:
