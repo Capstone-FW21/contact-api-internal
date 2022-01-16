@@ -29,7 +29,7 @@ def index():
     return fastapi.responses.RedirectResponse(url="./docs")
 
 #returns all scans in scan table
-@app.get("/user_records/")
+@app.get("/records/")
 def records():
     global connection
     if connection is None:
