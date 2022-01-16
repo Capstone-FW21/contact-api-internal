@@ -101,7 +101,7 @@ def stats(stat_type: StatTypes):
 
 #adds room
 @app.post("/add_room/")
-def add_room(room_id: str, capacity: int, building_name: str):
+def api_add_room(room_id: str, capacity: int, building_name: str):
     global connection
     if connection is None:
         connection = connect_to_db()
