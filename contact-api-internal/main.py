@@ -100,7 +100,7 @@ def stats(stat_type: StatTypes):
     return result
 
 #adds room
-@app.get("/add_room/")
+@app.post("/add_room/")
 def add_room(room_id: str, capacity: int, building_name: str):
     global connection
     if connection is None:
