@@ -12,14 +12,14 @@ from enum import Enum
 app = FastAPI()
 connection = None
 
-
+"""
 # to ensure only valid types are passed in
 class StatTypes(str, Enum):
     students = "students"
     records = "records"
     buildings = "buildings"
     rooms = "rooms"
-
+"""
 
 @app.get("/", include_in_schema=False)
 def index():
@@ -70,7 +70,7 @@ def breakout(email: str, date: str):
 
 #returns all entries for specific type
 @app.get("/stats/")
-def stats(type: StatTypes):
+def stats(type: str):
     global connection
     if connection is None:
         connection = connect_to_db()
@@ -96,6 +96,9 @@ def stats(type: StatTypes):
             if result == None:
                 raise fastapi.HTTPException(
                     status_code=400, detail="No room exists")
+        case _:
+            raise fastapi.HTTPException(
+                status_code=400, detail="invalid stat type selected")
 
     return result
 
