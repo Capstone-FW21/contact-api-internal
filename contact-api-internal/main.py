@@ -76,7 +76,7 @@ def stats(stat_type: StatTypes):
         connection = connect_to_db()
 
     match stat_type:
-        case 'student':
+        case 'students':
             result = get_people(connection)
             if result == None:
                 raise fastapi.HTTPException(
