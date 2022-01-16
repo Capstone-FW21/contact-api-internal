@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM python:3.10
 ENV APP_HOME /contact-api-internal
 WORKDIR $APP_HOME
 COPY . ./
