@@ -30,12 +30,12 @@ def index():
 
 #returns all scans in scan table
 @app.get("/records/")
-def records():
+def records(limit:int):
     global connection
     if connection is None:
         connection = connect_to_db()
     
-    records = retrieve_records(connection)
+    records = retrieve_records(limit, connection)
     if records is None:
         raise fastapi.HTTPException(
             status_code=400, detail="There are no scans")
@@ -48,7 +48,7 @@ def user_records(email: str, limit: int):
     if connection is None:
         connection = connect_to_db()
 
-    user_record = retrieve_user_records(email, connection)
+    user_record = retrieve_user_records(email, limit, connection)
     if user_record == None:
         raise fastapi.HTTPException(
             status_code=400, detail="There are no scans for this person")
