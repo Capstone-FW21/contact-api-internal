@@ -7,6 +7,7 @@ from fastapi import FastAPI, status
 from typing import List
 from sarge import capture_stdout
 from enum import Enum
+import datetime
 
 
 app = FastAPI()
@@ -59,9 +60,20 @@ def user_records(email: str, limit: int):
     return user_record
 
 #returns all people in contact with email address
+#date format should be: June 28 2018 7:40AM, October 10 2013 10:50PM
 @app.get("/breakout/")
 def breakout(email: str, date: str):
-    contacted = retrieve_contacts(email, date, connection)
+
+    global connection
+    if connection is None:
+        connection = connect_to_db()
+    
+    try:
+        date_time_obj = datetime.datetime.strptime(date, '%B %d %Y %I:%M%p')
+    except:
+        raise fastapi.HTTPException(status_code=400, detail="Invalid date format")
+
+    contacted = retrieve_contacts(email, date_time_obj, connection)
     if contacted == -1:
         raise fastapi.HTTPException(
             status_code=400, detail="Invalid email format, or date is greater than 14 days ago")
