@@ -1,5 +1,5 @@
 from sqlite3 import connect
-from ctdb_utility_lib.utility import add_room, connect_to_db, get_person, validate_email_format, exists_in_people
+from ctdb_utility_lib.utility import add_room, connect_to_db, get_person
 from ctdb_utility_lib.admin_utility import retrieve_records, retrieve_user_records, retrieve_contacts, get_people, get_records_count, get_rooms, get_buildings, connect_to_db
 import fastapi
 import sys
@@ -29,25 +29,6 @@ def index():
     Main index redirects to the Documentation.
     """
     return fastapi.responses.RedirectResponse(url="./docs")
-
-#Check if email is valid
-@app.get("/email/")
-def email(email:str):
-    global connection
-    if connection is None:
-        connection = connect_to_db()
-    
-    valid_email = validate_email_format(email)
-    if valid_email:
-        email_exist = exists_in_people(email, connection)
-        if email_exist:
-            return email #for now, return email
-        else:
-            raise fastapi.HTTPException(
-            status_code=400, detail="Email doesn't exist")
-    else:
-        raise fastapi.HTTPException(
-            status_code=400, detail="Invalid email format")
 
 
 #returns all scans in scan table
