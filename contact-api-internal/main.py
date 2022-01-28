@@ -5,8 +5,10 @@ import fastapi
 import sys
 from fastapi import FastAPI, status
 from typing import List
+from pydantic import validate_email
 from sarge import capture_stdout
 from enum import Enum
+import datetime
 
 
 app = FastAPI()
@@ -28,14 +30,15 @@ def index():
     """
     return fastapi.responses.RedirectResponse(url="./docs")
 
+
 #returns all scans in scan table
-@app.get("/user_records/")
-def records():
+@app.get("/records/")
+def records(limit:int):
     global connection
     if connection is None:
         connection = connect_to_db()
     
-    records = retrieve_records(connection)
+    records = retrieve_records(limit, connection)
     if records is None:
         raise fastapi.HTTPException(
             status_code=400, detail="There are no scans")
@@ -48,7 +51,7 @@ def user_records(email: str, limit: int):
     if connection is None:
         connection = connect_to_db()
 
-    user_record = retrieve_user_records(email, connection)
+    user_record = retrieve_user_records(email, limit, connection)
     if user_record == None:
         raise fastapi.HTTPException(
             status_code=400, detail="There are no scans for this person")
@@ -59,9 +62,20 @@ def user_records(email: str, limit: int):
     return user_record
 
 #returns all people in contact with email address
+#date format should be: June 28 2018 7:40AM, October 10 2013 10:50PM
 @app.get("/breakout/")
 def breakout(email: str, date: str):
-    contacted = retrieve_contacts(email, date, connection)
+
+    global connection
+    if connection is None:
+        connection = connect_to_db()
+    
+    try:
+        date_time_obj = datetime.datetime.strptime(date, '%B %d %Y %I:%M%p')
+    except:
+        raise fastapi.HTTPException(status_code=400, detail="Invalid date format")
+
+    contacted = retrieve_contacts(email, date_time_obj, connection)
     if contacted == -1:
         raise fastapi.HTTPException(
             status_code=400, detail="Invalid email format, or date is greater than 14 days ago")
@@ -70,13 +84,13 @@ def breakout(email: str, date: str):
 
 #returns all entries for specific type
 @app.get("/stats/")
-def stats(type: StatTypes):
+def stats(stat_type: StatTypes):
     global connection
     if connection is None:
         connection = connect_to_db()
 
-    match type:
-        case 'student':
+    match stat_type:
+        case 'students':
             result = get_people(connection)
             if result == None:
                 raise fastapi.HTTPException(
@@ -100,13 +114,13 @@ def stats(type: StatTypes):
     return result
 
 #adds room
-@app.get("/add_room/")
-def add_room(room_id: str, capacity: int, building_name: str):
+@app.post("/add_room/")
+def api_add_room(room_id: str, capacity: int, building_name: str):
     global connection
     if connection is None:
         connection = connect_to_db()
 
-    response = add_room(room_id, capacity, building_name)
+    response = add_room(room_id, capacity, building_name, connection)
     if response == -1:
         raise fastapi.HTTPException(
             status_code=400, detail="Room Id/Building name invalid, or room already exists")
