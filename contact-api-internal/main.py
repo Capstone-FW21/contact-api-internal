@@ -115,15 +115,15 @@ def stats(stat_type: StatTypes):
 
 #adds room
 @app.post("/add_room/")
-def api_add_room(room_id: str, capacity: int, building_name: str):
+def api_add_room(room_id: str, capacity: int, building_name: str, room_aspect_ratio: str):
     global connection
     if connection is None:
         connection = connect_to_db()
 
-    response = add_room(room_id, capacity, building_name, connection)
+    response = add_room(room_id, capacity, building_name, room_aspect_ratio, connection)
     if response == -1:
         raise fastapi.HTTPException(
-            status_code=400, detail="Room Id/Building name invalid, or room already exists")
+            status_code=400, detail="Room Id/Building name invalid, or room already exists, or invalid aspect ratio")
     return "Room Added"
 
 
