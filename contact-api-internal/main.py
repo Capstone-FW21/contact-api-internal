@@ -1,7 +1,4 @@
-from difflib import restore
-from sqlite3 import connect
-from unittest import result
-from ctdb_utility_lib.utility import add_room, connect_to_db, get_person
+from ctdb_utility_lib.utility import add_room, connect_to_db
 from ctdb_utility_lib.admin_utility import (
     get_records,
     get_user_records,
@@ -20,8 +17,7 @@ from ctdb_utility_lib.admin_utility import (
 import fastapi
 import sys
 from fastapi import FastAPI, status
-from typing import List
-from pydantic import validate_email
+from typing import List, Optional
 from sarge import capture_stdout
 from enum import Enum
 import datetime
@@ -147,31 +143,28 @@ def total_rooms():
 
     return get_rooms_count(connection)
 
+#if no data provided
 #gets room id, capacity, building name, the total number of scans that happened in the room,
 #count of unique students that have scanned in the room, and # of scans per day for that room 
-@app.get("/all_rooms")
-def rooms_data():
-    global connection
-    if connection is None:
-        connection = connect_to_db()
-
-    result = get_rooms(connection)
-    if result is None:
-        raise fastapi.HTTPException(
-                    status_code=400, detail="No room data")
-    return result
-
+#else
 #gets singular room data
-@app.get("/room")
-def room_data(room_id: str):
+@app.get("/rooms")
+def room_data(room_id: Optional[str] = None):
     global connection
     if connection is None:
         connection = connect_to_db()
 
-    result = get_room(room_id, connection)
-    if result is None:
-        raise fastapi.HTTPException(
-                    status_code=400, detail="Room does not exist")
+    if room_id:
+        result = get_room(room_id, connection)
+        if result is None:
+            raise fastapi.HTTPException(
+                status_code=400, detail="room does not exist")
+    else:
+        result = get_rooms(connection)
+        if result is None:
+            raise fastapi.HTTPException(
+                status_code=400, detail="No rooms exist")
+    
     return result
 
 #get number of buildings in database
@@ -183,30 +176,26 @@ def building_count():
 
     return get_buildings_count(connection)
 
+#if no data provided,
 #gets building name, # of rooms in that building, # of scans that has been made in that building,
 # the total number of unique students that scanned in that building, and scans per day 
-@app.get("/all_buildings")
-def buildings():
-    global connection
-    if connection is None:
-        connection = connect_to_db()
-
-    result = get_buildings(connection)
-    if result is None:
-        raise fastapi.HTTPException(
-                    status_code=400, detail="Building does not exist")
-    return result
-
-@app.get("/building")
-def building(building_id: str):
+#else returns specified building data
+@app.get("/buildings")
+def building(building_id: Optional[str] = None):
     global connection
     if connection is None:
         connection = connect_to_db()
     
-    result = get_building(building_id, connection)
-    if result is None:
-        raise fastapi.HTTPException(
-                    status_code=400, detail="Building does not exist")
+    if building_id:
+        result = get_building(building_id, connection)
+        if result is None:
+            raise fastapi.HTTPException(
+                status_code=400, detail="No buildings exist")
+    else:
+        result = get_buildings(connection)
+        if result is None:
+            raise fastapi.HTTPException(
+                status_code=400, detail="Building does not exist")
     return result
 
 #adds room
