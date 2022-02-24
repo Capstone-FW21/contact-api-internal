@@ -167,11 +167,11 @@ def room_data(room_id: Optional[str] = None):
         if result is None:
             raise fastapi.HTTPException(
                 status_code=400, detail="No rooms exist")
-                
-    result.insert(0, temp)
-    new_list = [dict(zip(result[0], row)) for row in result[1:]]
+        result.insert(0, temp)
+        new_list = [dict(zip(result[0], row)) for row in result[1:]]
+        return new_list
     
-    return new_list
+    return result
 
 #get number of buildings in database
 @app.get("/building_count")
