@@ -144,7 +144,7 @@ def total_rooms():
     return get_rooms_count(connection)
 
 #if no data provided
-#gets room id, capacity, building name, the total number of scans that happened in the room,
+#gets room id, capacity, building name, aspect ratio, the total number of scans that happened in the room,
 #count of unique students that have scanned in the room, and # of scans per day for that room 
 #else
 #gets singular room data
@@ -153,6 +153,9 @@ def room_data(room_id: Optional[str] = None):
     global connection
     if connection is None:
         connection = connect_to_db()
+
+    temp = ["Room", "Capacity", "Building_Name", "Aspect_Ratio", "Number_of_Scans", "Unique_Students", "Scans_per_Day"]
+
 
     if room_id:
         result = get_room(room_id, connection)
@@ -164,8 +167,11 @@ def room_data(room_id: Optional[str] = None):
         if result is None:
             raise fastapi.HTTPException(
                 status_code=400, detail="No rooms exist")
+                
+    result.insert(0, temp)
+    new_list = [dict(zip(result[0], row)) for row in result[1:]]
     
-    return result
+    return new_list
 
 #get number of buildings in database
 @app.get("/building_count")
@@ -186,7 +192,7 @@ def building(building_id: Optional[str] = None):
     if connection is None:
         connection = connect_to_db()
 
-    temp = ["Building", "Number_of_Rooms", "Number_of_Scans", "Number_of_Students", "Scans_per_Day"]
+    temp = ["Building", "Number_of_Rooms", "Number_of_Scans", "Unique_Students", "Scans_per_Day"]
     
     if building_id:
         result = get_building(building_id, connection)
