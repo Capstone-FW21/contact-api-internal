@@ -162,6 +162,8 @@ def room_data(room_id: Optional[str] = None):
         if result is None:
             raise fastapi.HTTPException(
                 status_code=400, detail="room does not exist")
+        new_list = dict(zip(temp,result))
+        return new_list
     else:
         result = get_rooms(connection)
         if result is None:
@@ -199,16 +201,16 @@ def building(building_id: Optional[str] = None):
         if result is None:
             raise fastapi.HTTPException(
                 status_code=400, detail="No buildings exist")
+        new_list = dict(zip(temp,result))
+        return new_list
     else:
         result = get_buildings(connection)
         if result is None:
             raise fastapi.HTTPException(
                 status_code=400, detail="Building does not exist")
-        
-    result.insert(0, temp)
-    new_list = [dict(zip(result[0], row)) for row in result[1:]]
-    
-    return new_list
+        result.insert(0, temp)
+        new_list = [dict(zip(result[0], row)) for row in result[1:]]
+        return new_list
 
 #adds room
 @app.post("/add_room")
