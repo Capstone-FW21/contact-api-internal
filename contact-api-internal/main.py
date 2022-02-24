@@ -200,7 +200,7 @@ def building(building_id: Optional[str] = None):
                 status_code=400, detail="Building does not exist")
         
     result.insert(0, temp)
-    new_list = {[dict(zip(result[0], row)) for row in result[1:]]}
+    new_list = [dict(zip(result[0], row)) for row in result[1:]]
     
     return new_list
 
