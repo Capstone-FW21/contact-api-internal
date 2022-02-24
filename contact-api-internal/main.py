@@ -196,7 +196,12 @@ def building(building_id: Optional[str] = None):
         if result is None:
             raise fastapi.HTTPException(
                 status_code=400, detail="Building does not exist")
-    return result
+        
+        temp = ["Building", "Number_of_Rooms", "Number_of_Scans", "Number_of_Students", "Scans_per_Day"]
+        result.insert(0, temp)
+
+        new_list = {[dict(zip(result[0], row)) for row in result[1:]]}
+    return new_list
 
 #adds room
 @app.post("/add_room")
