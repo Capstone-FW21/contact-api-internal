@@ -185,6 +185,8 @@ def building(building_id: Optional[str] = None):
     global connection
     if connection is None:
         connection = connect_to_db()
+
+    temp = ["Building", "Number_of_Rooms", "Number_of_Scans", "Number_of_Students", "Scans_per_Day"]
     
     if building_id:
         result = get_building(building_id, connection)
@@ -197,10 +199,9 @@ def building(building_id: Optional[str] = None):
             raise fastapi.HTTPException(
                 status_code=400, detail="Building does not exist")
         
-        temp = ["Building", "Number_of_Rooms", "Number_of_Scans", "Number_of_Students", "Scans_per_Day"]
-        result.insert(0, temp)
-
-        new_list = {[dict(zip(result[0], row)) for row in result[1:]]}
+    result.insert(0, temp)
+    new_list = {[dict(zip(result[0], row)) for row in result[1:]]}
+    
     return new_list
 
 #adds room
