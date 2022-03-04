@@ -63,6 +63,8 @@ def user_records(email: str, limit: int):
     if connection is None:
         connection = connect_to_db()
 
+    email = email.lower()
+
     user_record = get_user_records(email, limit, connection)
     if user_record == None:
         raise fastapi.HTTPException(
@@ -82,6 +84,7 @@ def breakout(email: str, date: str):
     if connection is None:
         connection = connect_to_db()
     
+    email = email.lower()
     try:
         date_time_obj = datetime.datetime.strptime(date, '%B %d %Y %I:%M%p')
     except:
